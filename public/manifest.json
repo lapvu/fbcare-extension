@@ -1,0 +1,40 @@
+{
+    "name": "fbcare",
+    "version": "1.0",
+    "description": "facebook care!",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_title": "FB CARE"
+    },
+    "background": {
+        "scripts": [
+            "/background/index.js"
+        ]
+    },
+    "permissions": [
+        "http://*/*",
+        "https://*/*",
+        "notifications",
+        "cookies",
+        "webRequest",
+        "webRequestBlocking",
+        "storage",
+        "unlimitedStorage"
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "web_accessible_resources": [
+        "index.html"
+    ],
+    "content_scripts": [
+        {
+            "all_frames": true,
+            "js": [
+                "/content/index.js"
+            ],
+            "matches": [
+                "*://www.facebook.com/*",
+                "*://www.messenger.com/*"
+            ]
+        }
+    ]
+}

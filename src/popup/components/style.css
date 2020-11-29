@@ -1,0 +1,39 @@
+.my-layout {
+  height: 100vh;
+}
+
+.trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+.conversation {
+  cursor: pointer;
+  transition: 1s;
+}
+
+.conversation:hover {
+  background: #c9c9c9;
+}
+
+.ant-collapse .ant-collapse-item .ant-collapse-header{
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
