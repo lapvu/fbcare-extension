@@ -8,3 +8,4 @@ export const ORDER_ROUTE = "/order";
 export const HOME_ROUTE = "/";
 export const CONVERSATION_ROUTE = "/conversation";
 export const PRODUCT_ROUTE = "/product";
+export const PROFILE_ROUTE = "/profile"

@@ -10,6 +10,7 @@ export interface Order {
     district: string;
     commune: string;
     weight: number;
+    amount: number;
     products: [
         {
             sku: string,

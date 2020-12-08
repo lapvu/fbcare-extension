@@ -16,5 +16,5 @@ export function getNotes(customer_id: string) {
 }
 
 export function deleteNote(note_id: string) {
-    return axios.delete(`/note?customer_id=${note_id}`)
+    return axios.delete(`/note?note_id=${note_id}`)
 }

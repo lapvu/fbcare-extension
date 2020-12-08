@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "watch": "snowpack build --watch"
+    "watch": "snowpack build --watch --env MODE=development"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.0.4",

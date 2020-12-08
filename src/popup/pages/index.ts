@@ -5,3 +5,4 @@ export * from "./login";
 export * from "./register"
 export * from "./transport";
 export * from "./dashboard";
+export * from "./profile";

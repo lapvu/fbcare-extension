@@ -21,16 +21,6 @@ function enableIframeAccess() {
     );
 }
 
-function handleRequest() {
-    chrome.webRequest.onBeforeRequest.addListener(function (details) {
-        const match = details.url.match(/&user_id=|\?user_id=(.*?)/) as any;
-        if (match) {
-            const userId = details.url.split("&user_id=")[1] || details.url.split("?user_id=")[1];
-            chrome.runtime.sendMessage({ type: "USER_ID", userId });
-        }
-    }, { urls: ["<all_urls>"] })
-}
-
 function enableFbRequestAccess() {
     chrome.webRequest.onBeforeSendHeaders.addListener(
         (req) => {
@@ -135,7 +125,6 @@ function setStorage(data: any) {
 main(async function (tab: any) {
     enableIframeAccess();
     enableFbRequestAccess();
-    handleRequest();
     try {
         const userId = await getFbUserId();
         const token = await getFbAccessToken();
@@ -150,4 +139,58 @@ main(async function (tab: any) {
         chrome.storage.sync.remove("fbInfo");
         console.log(error)
     }
-}) 
+});
+
+
+let old_id = "";
+chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
+    if (message.type === "CUSTOMER_CHANGE_CONTENT") {
+        if (sender.origin === "https://www.facebook.com") {
+            const match = message.url.match(/&selected_item_id=(.*?)/);
+            if (match) {
+                const customer_id = message.url.split("&selected_item_id=")[1];
+                if (old_id !== customer_id) {
+                    old_id = customer_id;
+                    let real_id = await getRealCustomerId(customer_id);
+                    if (real_id) {
+                        chrome.runtime.sendMessage({ type: "CUSTOMER_CHANGE_BG", customer_id: real_id });
+                    } else {
+                        chrome.runtime.sendMessage({ type: "NO_CUSTOMER_ID" });
+                    }
+                }
+            }
+        } else if (sender.origin === "https://www.messenger.com") {
+            const match = message.url.match(/https:\/\/www.messenger.com\/t\/(.*?)/);
+            if (match) {
+                let customer_id = message.url.replace("https://www.messenger.com/t/", "");
+                if (old_id !== customer_id) {
+                    old_id = customer_id;
+                    let real_id = await getRealCustomerId(customer_id);
+                    if (real_id) {
+                        chrome.runtime.sendMessage({ type: "CUSTOMER_CHANGE_BG", customer_id: real_id });
+                    } else {
+                        chrome.runtime.sendMessage({ type: "NO_CUSTOMER_ID" });
+                    }
+                }
+            }
+        }
+    }
+    if (message.type === "CONVERSATION_INIT") {
+        old_id = "";
+    }
+});
+
+function getRealCustomerId(id: string) {
+    return new Promise((resolve, reject) => {
+        return fetch(`https://facebook.com/${id}`)
+            .then((res) => res.text())
+            .then(html => {
+                const match = html.match(/"userID":"(.*?)"/);
+                if (match) {
+                    resolve(match[1]);
+                } else {
+                    resolve("")
+                }
+            }).catch(err => resolve(""));
+    })
+}

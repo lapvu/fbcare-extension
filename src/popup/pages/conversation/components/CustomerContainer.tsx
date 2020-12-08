@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
-import { Button, Tabs, Form, Input, Table, List, Popconfirm } from 'antd';
+import { Button, Tabs, Form, Input, Table, List, Popconfirm, message } from 'antd';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import { getOrdersByCustomer, getNotes, addNote } from "../../../api"
+import { getOrdersByCustomer, getNotes, addNote, deleteNote } from "../../../api"
 const ShoppingCart = lazy(() => import('./ShoppingCart'));
 
 const { TabPane } = Tabs;
@@ -33,9 +33,15 @@ export const CustomerContainer = () => {
     const [form] = Form.useForm();
     useEffect(() => {
         setIsLoading(true);
+        chrome.runtime.sendMessage({ type: "CONVERSATION_INIT" });
         const listener = function (request: any) {
-            if (request.type === "USER_ID") {
-                setCustomerId(request.userId);
+            if (request.type === "CUSTOMER_CHANGE_BG") {
+                setCustomerId(request.customer_id);
+                setIsLoading(false);
+            }
+            if (request.type === "NO_CUSTOMER_ID") {
+                setCustomerId("");
+                setNotes([]);
                 setIsLoading(false);
             }
         }
@@ -72,9 +78,14 @@ export const CustomerContainer = () => {
         }
     }
 
-    const deleteNote = async (note_id: string) => {
+    const removeNote = async (note_id: string) => {
         const res = await deleteNote(note_id);
-        console.log(res);
+        if (res.data && res.data.ok === 1) {
+            const copy = notes.filter((e: any) => e._id !== note_id);
+            setNotes(copy);
+        } else {
+            message.warn("Bạn không thể xóa ghi chú này!")
+        }
     }
 
     return (
@@ -95,7 +106,13 @@ export const CustomerContainer = () => {
                                 ></Input.TextArea>
                             </Form.Item>
                             <Form.Item>
-                                <Button htmlType="submit" type="primary" disabled={isLoading}>Lưu</Button>
+                                <Button
+                                    htmlType="submit"
+                                    type="primary"
+                                    disabled={isLoading || customerId === "" ? true : false}
+                                >
+                                    Lưu
+                                </Button>
                             </Form.Item>
                         </Form>
                         <List
@@ -105,7 +122,14 @@ export const CustomerContainer = () => {
                             loading={isLoading}
                             renderItem={(item: any) => (
                                 <List.Item
-                                    actions={[<Popconfirm placement="left" title="Bạn có muốn xóa ghi chú này?" key="list-remove" onConfirm={() => deleteNote(item._id)} okText="Có" cancelText="Không">
+                                    actions={[<Popconfirm
+                                        placement="left"
+                                        title="Bạn có muốn xóa ghi chú này?"
+                                        key="list-remove"
+                                        onConfirm={() => removeNote(item._id)}
+                                        okText="Có"
+                                        cancelText="Không"
+                                    >
                                         <Button type="link">Xóa</Button>
                                     </Popconfirm>]}
                                 >
@@ -129,6 +153,7 @@ export const CustomerContainer = () => {
                     type="primary"
                     icon={<PlusOutlined />}
                     onClick={() => setVisible(true)}
+                    disabled={customerId === "" ? true : false}
                 >
                     Tạo đơn hàng mới
                  </Button>

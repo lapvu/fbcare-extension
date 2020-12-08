@@ -36,10 +36,10 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
     const [districts, setDistricts] = useState([]);
     const [communes, setCommunes] = useState([]);
     const [shoppingCart, setShoppingCart] = useState([])
-    const [isLoading, setIsLoading] = useState(false);
-    const [isFormSubmit, setIsFormSubmit] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isFormSubmit, setIsFormSubmit] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [amount, setAmount] = useState<number>(0);
     useEffect(() => {
         const getProvinces = async () => {
             setIsLoading(true);
@@ -90,8 +90,12 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
         shoppingCart.forEach((e: any) => {
             total += (e.quantity * e.price)
         })
-        return total;
+        setAmount(total);
     }
+
+    useEffect(() => {
+        totalPrice();
+    }, [shoppingCart])
 
     const onFinish = async (values: any) => {
         if (shoppingCart.length === 0) {
@@ -113,20 +117,29 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                 products: [...products] as any,
                 weight: 1000,
                 address: values.address,
+                amount,
                 commune: JSON.parse(values.commune).name,
                 district: JSON.parse(values.district).name,
                 province: JSON.parse(values.province).name
             }
-            const order = await createOrder(orderInVo);
-            if (order) {
-                message.success('Tạo đơn hàng thành công!');
-                form.resetFields();
-                setShoppingCart([]);
+            try {
+                const order = await createOrder(orderInVo);
+                if (order) {
+                    message.success('Tạo đơn hàng thành công!');
+                    form.resetFields();
+                    setShoppingCart([]);
+                    setVisible(false);
+                }
+                setIsFormSubmit(false);
+            } catch (error) {
+                if (error.error.name === "transport") {
+                    message.error("Bạn chưa cài đặt vận chuyển!");
+                }
+                setIsFormSubmit(false);
             }
-            setIsFormSubmit(false);
         }
     };
-
+    
     const columns = [
         {
             title: '',
@@ -199,7 +212,7 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                         alignItems: "center"
                     }}>
                         <Typography.Text>Tổng tiền: </Typography.Text><NumberFormat
-                            value={totalPrice()}
+                            value={amount}
                             displayType={'text'}
                             thousandSeparator={'.'}
                             decimalSeparator={','}
@@ -250,7 +263,13 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                         <Form.Item
                             name="customer_phone"
                             label="Số điện thoại"
-                            rules={[{ required: true }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    validator: (_, value) =>
+                                        /(03|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value) ? Promise.resolve() : Promise.reject("Số điện thoại không đúng định dạng!"),
+                                },
+                            ]}
                         >
                             <Input />
                         </Form.Item>

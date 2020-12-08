@@ -72,11 +72,11 @@ export const RegisterPage = () => {
                 rules={[
                     {
                         type: 'email',
-                        message: 'The input is not valid E-mail!',
+                        message: 'E-mail không đúng định dạng!',
                     },
                     {
                         required: true,
-                        message: 'Please input your E-mail!',
+                        message: 'Vui lòng nhập E-mail!',
                     },
                 ]}
             >
@@ -88,12 +88,12 @@ export const RegisterPage = () => {
                 rules={[
                     {
                         required: true,
-                        message: 'Please input your password!',
+                        message: 'Vui lòng nhập mật khẩu!',
                     },
                 ]}
                 hasFeedback
             >
-                <Input.Password placeholder="Password" />
+                <Input.Password placeholder="Mật khẩu" />
             </Form.Item>
 
             <Form.Item
@@ -103,33 +103,33 @@ export const RegisterPage = () => {
                 rules={[
                     {
                         required: true,
-                        message: 'Please confirm your password!',
+                        message: 'Vui lòng Xác nhận mật khẩu!',
                     },
                     ({ getFieldValue }) => ({
                         validator(_, value) {
                             if (!value || getFieldValue('password') === value) {
                                 return Promise.resolve();
                             }
-                            return Promise.reject('The two passwords that you entered do not match!');
+                            return Promise.reject('Hai mật khẩu không khớp!');
                         },
                     }),
                 ]}
             >
-                <Input.Password placeholder="Confirm Password" />
+                <Input.Password placeholder="Xác nhập mật khẩu" />
             </Form.Item>
 
             <Form.Item
-                name="displayName"
-                rules={[{ required: true, message: 'Please input your nickname!', whitespace: true }]}
+                name="display_name"
+                rules={[{ required: true, message: 'Vui lòng nhập tên hiển thị!', whitespace: true }]}
             >
-                <Input placeholder="Display Name" />
+                <Input placeholder="Tên hiển thị" />
             </Form.Item>
 
             <Form.Item
                 name="phone"
-                rules={[{ required: true, message: 'Please input your phone number!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
             >
-                <Input addonBefore={prefixSelector} style={{ width: '100%' }} placeholder="Phone Number" />
+                <Input addonBefore={prefixSelector} style={{ width: '100%' }} placeholder="Số điện thoại" />
             </Form.Item>
 
             <Form.Item
@@ -138,17 +138,17 @@ export const RegisterPage = () => {
                 rules={[
                     {
                         validator: (_, value) =>
-                            value ? Promise.resolve() : Promise.reject('Should accept agreement'),
+                            value ? Promise.resolve() : Promise.reject('Bạn chưa xác nhận các điều khoản!'),
                     },
                 ]}
             >
                 <Checkbox>
-                    I have read the <a href="">agreement</a>
+                    Tôi đồng ý với các <a href="">điều khoản</a>
                 </Checkbox>
             </Form.Item>
             <Form.Item >
                 <Button type="primary" htmlType="submit" block loading={isLoading}>
-                    Register
+                    Đăng ký
           </Button>
             </Form.Item>
         </Form>

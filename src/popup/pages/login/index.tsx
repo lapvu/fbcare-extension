@@ -49,31 +49,31 @@ export const LoginPage = () => {
             >
                 <Form.Item
                     name="identifier"
-                    rules={[{ required: true, message: 'Please input your E-mail or Phone number!' }]}
+                    rules={[{ required: true, message: 'Vui lòng nhập E-mail hoặc Số điện thoại!' }]}
                 >
-                    <Input placeholder="E-mail or Phone number" />
+                    <Input placeholder="E-mail/Số điện thoại" />
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                    rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
                 >
                     <Input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Mật khẩu"
                     />
                 </Form.Item>
                 <Form.Item>
                     <Form.Item name="remember" valuePropName="checked" noStyle>
-                        <Checkbox>Remember me</Checkbox>
+                        <Checkbox>Ghi nhớ</Checkbox>
                     </Form.Item>
-                    <Link to="forgot-password" style={{ float: "right" }}>Forgot password</Link>
+                    <Link to="forgot-password" style={{ float: "right" }}>Quên mật khẩu</Link>
                 </Form.Item>
 
                 <Form.Item>
                     <Button type="primary" htmlType="submit" block loading={isLoading}>
-                        Log in
+                        Đăng nhập
           </Button>
-          Or <Link to="/register">register now!</Link>
+          Or <Link to="/register">Đăng ký ngay!</Link>
                 </Form.Item>
             </Form>
         </>

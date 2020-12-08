@@ -1,5 +1,6 @@
 import React from "react"
 import { Route, Switch, HashRouter, Redirect } from "react-router-dom";
+import { useSelector } from 'react-redux';
 import { MyLayout } from './components/Layout';
 import {
     LoginPage,
@@ -8,7 +9,8 @@ import {
     NotFoundPage,
     EmployeePage,
     ConversationPage,
-    TransportPage
+    TransportPage,
+    ProfilePage
 } from "./pages";
 import {
     LOGIN_ROUTE,
@@ -18,13 +20,15 @@ import {
     HOME_ROUTE,
     CONVERSATION_ROUTE,
     PRODUCT_ROUTE,
-    TRANSPORT_ROUTE
+    TRANSPORT_ROUTE,
+    PROFILE_ROUTE
 } from "./constant"
 import { PrivateRoute } from "./guard";
 import "./App.css";
 import { ProductPage } from "./pages/product";
 
 export function App() {
+    const state = useSelector((state: any) => state.authReducer);
     return (
         <HashRouter>
             <Switch>
@@ -46,15 +50,23 @@ export function App() {
                             <Route path={CONVERSATION_ROUTE}>
                                 <ConversationPage />
                             </Route>
-                            <Route path={PRODUCT_ROUTE}>
-                                <ProductPage />
+                            <Route path={PROFILE_ROUTE}>
+                                <ProfilePage />
                             </Route>
-                            <Route path={EMPLOYEE_ROUTE}>
-                                <EmployeePage />
-                            </Route>
-                            <Route path={TRANSPORT_ROUTE}>
-                                <TransportPage />
-                            </Route>
+                            {state.roles.includes("supplier")
+                                ? <>
+                                    <Route path={PRODUCT_ROUTE}>
+                                        <ProductPage />
+                                    </Route>
+                                    <Route path={EMPLOYEE_ROUTE}>
+                                        <EmployeePage />
+                                    </Route>
+                                    <Route path={TRANSPORT_ROUTE}>
+                                        <TransportPage />
+                                    </Route>
+                                </>
+                                : <Redirect to="/dashboard" />
+                            }
                             <Route path="*">
                                 <NotFoundPage />
                             </Route>

@@ -4,7 +4,7 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
 } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Sidebar } from './Sidebar';
 import { UserMenu } from "./Menu";
 import "./style.css";
@@ -35,13 +35,15 @@ export const MyLayout = ({ children }: any) => {
                         margin: "0 24px"
                     }}>
                         <Dropdown overlay={<UserMenu />} placement="bottomLeft" arrow>
-                            <Avatar
-                                style={{
-                                    color: '#f56a00',
-                                    backgroundColor: '#fde3cf',
-                                    cursor: "pointer"
-                                }}>U
-                                  </Avatar>
+                            <Link to="profile">
+                                <Avatar
+                                    style={{
+                                        color: '#f56a00',
+                                        backgroundColor: '#fde3cf',
+                                        cursor: "pointer"
+                                    }}>U
+                                </Avatar>
+                            </Link>
                         </Dropdown>
                     </div>
                 </Header>

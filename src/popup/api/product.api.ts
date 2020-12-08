@@ -2,11 +2,11 @@ import queryString from 'query-string';
 import axios from "./axios";
 
 export interface ProductInVO {
-    productName: string;
-    productDesc: string;
+    product_name: string;
+    product_desc: string;
     image: string;
     price: number;
-    quantity: number
+    quantity: number;
 }
 
 export interface GetProductsInVO {

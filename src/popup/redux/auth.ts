@@ -5,20 +5,20 @@ const authSlice = createSlice({
     name: 'auth',
     initialState: {
         isAuthenticated: false,
-        displayName: "",
-        email: ""
+        display_name: "",
+        roles: []
     },
     reducers: {
         login: (state, actions): any => {
-            const { displayName, email }: any = jwt_decode(actions.payload);
-            state.displayName = displayName;
-            state.email = email;
+            const { display_name, roles }: any = jwt_decode(actions.payload);
+            state.display_name = display_name;
+            state.roles = roles
             state.isAuthenticated = true;
             localStorage.setItem("access_token", actions.payload)
         },
         logout: (state): any => {
-            state.displayName = "";
-            state.email = "";
+            state.display_name = "";
+            state.roles = [];
             state.isAuthenticated = false;
             localStorage.removeItem("access_token")
         }
