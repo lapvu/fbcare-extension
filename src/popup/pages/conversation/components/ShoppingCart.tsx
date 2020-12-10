@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, Suspense, lazy } from "react";
+import React, { FC, useState, useEffect, lazy } from "react";
 import {
     Drawer,
     Row,
@@ -14,6 +14,7 @@ import {
     Divider,
     Typography,
     message,
+    AutoComplete,
 } from "antd";
 import NumberFormat from 'react-number-format';
 import { createOrder, getCommune, getDistrict, getProvince, Order } from '../../../api';
@@ -30,15 +31,27 @@ const validateMessages = {
     },
 };
 
-const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }> = ({ visible, setVisible, customerId }) => {
+const mockVal = (str: string, repeat: number = 1) => {
+    return {
+        value: str.repeat(repeat),
+    };
+};
+
+const ShoppingCart: FC<{
+    visible: boolean,
+    setVisible: any,
+    customerId: string,
+    customerName: string,
+    customerPhone: string
+}> = ({ visible, setVisible, customerId, customerName, customerPhone }) => {
     const [form] = Form.useForm();
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [communes, setCommunes] = useState([]);
+    const [options, setOptions] = useState<{ value: string }[]>([]);
     const [shoppingCart, setShoppingCart] = useState([])
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isFormSubmit, setIsFormSubmit] = useState<boolean>(false);
-    const [showModal, setShowModal] = useState<boolean>(false);
     const [amount, setAmount] = useState<number>(0);
     useEffect(() => {
         const getProvinces = async () => {
@@ -49,6 +62,13 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
         }
         getProvinces()
     }, [])
+
+    useEffect(() => {
+        form.setFieldsValue({
+            customer_name: customerName,
+            customer_phone: customerPhone
+        })
+    }, [customerName, customerPhone])
 
     const handleProvinceChange = async (province: any) => {
         setIsLoading(true);
@@ -139,7 +159,16 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
             }
         }
     };
-    
+
+    const onSearch = (searchText: string) => {
+        setOptions(
+            !searchText ? [] : [mockVal(searchText), mockVal(searchText, 2), mockVal(searchText, 3)],
+        );
+    };
+    const onSelect = (data: string) => {
+        console.log('onSelect', data);
+    };
+
     const columns = [
         {
             title: '',
@@ -255,6 +284,7 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                             name="customer_name"
                             label="Tên khách hàng"
                             rules={[{ required: true }]}
+
                         >
                             <Input />
                         </Form.Item>
@@ -278,7 +308,6 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                         <Form.Item
                             name="customer_email"
                             label="Email"
-                            rules={[{ required: true }]}
                         >
                             <Input />
                         </Form.Item>
@@ -333,7 +362,14 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                     <Input />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" onClick={() => setShowModal(true)}>Thêm sản phẩm vào giỏ</Button>
+                    <AutoComplete
+                        style={{ width: 400 }}
+                        options={options}
+                        onSelect={onSelect}
+                        onSearch={onSearch}
+                    >
+                        <Input.Search placeholder="Thêm nhanh sản phẩm" enterButton />
+                    </AutoComplete>
                 </Form.Item>
             </Form>
             <Table
@@ -341,14 +377,6 @@ const ShoppingCart: FC<{ visible: boolean, setVisible: any, customerId: string }
                 columns={columns}
                 pagination={false}
             />
-            <Suspense fallback={<div>loading</div>}>
-                <SelectProductModal
-                    showModal={showModal}
-                    setShowModal={setShowModal}
-                    shoppingCart={shoppingCart}
-                    setShoppingCart={setShoppingCart}
-                />
-            </Suspense>
         </Drawer>
     )
 }

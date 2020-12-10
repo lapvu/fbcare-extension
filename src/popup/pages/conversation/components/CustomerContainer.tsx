@@ -27,6 +27,8 @@ const columns = [
 export const CustomerContainer = () => {
     const [visible, setVisible] = useState(false);
     const [customerId, setCustomerId] = useState("");
+    const [customerName, setCustomerName] = useState("");
+    const [customerPhone, setCustomerPhone] = useState("");
     const [orders, setOrders] = useState([]);
     const [notes, setNotes] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -37,12 +39,17 @@ export const CustomerContainer = () => {
         const listener = function (request: any) {
             if (request.type === "CUSTOMER_CHANGE_BG") {
                 setCustomerId(request.customer_id);
+                setCustomerName(request.customer_name)
                 setIsLoading(false);
             }
             if (request.type === "NO_CUSTOMER_ID") {
                 setCustomerId("");
                 setNotes([]);
                 setIsLoading(false);
+            }
+            if (request.type === "CREATE_ORDER_PHONE") {
+                setCustomerPhone(request.phone);
+                setVisible(true);
             }
         }
         chrome.runtime.onMessage.addListener(listener);
@@ -158,7 +165,13 @@ export const CustomerContainer = () => {
                     Tạo đơn hàng mới
                  </Button>
                 <Suspense fallback={<div>loading</div>}>
-                    <ShoppingCart visible={visible} setVisible={setVisible} customerId={customerId} />
+                    <ShoppingCart
+                        visible={visible}
+                        setVisible={setVisible}
+                        customerId={customerId}
+                        customerName={customerName}
+                        customerPhone={customerPhone}
+                    />
                 </Suspense>
             </div>
         </div>

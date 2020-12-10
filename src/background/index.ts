@@ -151,9 +151,13 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
                 const customer_id = message.url.split("&selected_item_id=")[1];
                 if (old_id !== customer_id) {
                     old_id = customer_id;
-                    let real_id = await getRealCustomerId(customer_id);
-                    if (real_id) {
-                        chrome.runtime.sendMessage({ type: "CUSTOMER_CHANGE_BG", customer_id: real_id });
+                    let result = await getRealCustomerId(customer_id) as any;
+                    if (result) {
+                        chrome.runtime.sendMessage({
+                            type: "CUSTOMER_CHANGE_BG",
+                            customer_id: result.real_id,
+                            customer_name: result.customer_name
+                        });
                     } else {
                         chrome.runtime.sendMessage({ type: "NO_CUSTOMER_ID" });
                     }
@@ -165,9 +169,13 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
                 let customer_id = message.url.replace("https://www.messenger.com/t/", "");
                 if (old_id !== customer_id) {
                     old_id = customer_id;
-                    let real_id = await getRealCustomerId(customer_id);
-                    if (real_id) {
-                        chrome.runtime.sendMessage({ type: "CUSTOMER_CHANGE_BG", customer_id: real_id });
+                    let result = await getRealCustomerId(customer_id) as any;
+                    if (result) {
+                        chrome.runtime.sendMessage({
+                            type: "CUSTOMER_CHANGE_BG",
+                            customer_id: result.real_id,
+                            customer_name: result.customer_name
+                        });
                     } else {
                         chrome.runtime.sendMessage({ type: "NO_CUSTOMER_ID" });
                     }
@@ -186,8 +194,9 @@ function getRealCustomerId(id: string) {
             .then((res) => res.text())
             .then(html => {
                 const match = html.match(/"userID":"(.*?)"/);
+                const title = html.match(/<title.*?>(.*)<\/title>/) as any;
                 if (match) {
-                    resolve(match[1]);
+                    resolve({ real_id: match[1], customer_name: title[1] });
                 } else {
                     resolve("")
                 }
