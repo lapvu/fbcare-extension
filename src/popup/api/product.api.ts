@@ -35,3 +35,6 @@ export function getProduct(id: string) {
     return axios.get(`/product/${id}`);
 }
 
+export function searchProducts(query: string) {
+    return axios.get(`/product/search?q=${query}`);
+}

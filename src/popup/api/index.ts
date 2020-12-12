@@ -5,3 +5,4 @@ export * from "./order.api";
 export * from "./transport.api";
 export * from "./note.api";
 export * from "./employee.api";
+export * from "./status.api";

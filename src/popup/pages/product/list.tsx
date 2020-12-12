@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { PageHeader, Space, Table, Image, Button, Popconfirm, message } from 'antd';
+import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
 import { deleteProduct, getProducts } from "../../api";
 
@@ -22,7 +23,7 @@ export const ListProductPage = () => {
 
     const columns = [
         {
-            title: 'Id',
+            title: 'Mã sản phẩm',
             dataIndex: '_id',
             key: '_id',
             render: (id: any) => <Link to={`/product/${id}`}>{id}</Link>,
@@ -41,6 +42,13 @@ export const ListProductPage = () => {
             title: 'Giá tiền',
             key: 'price',
             dataIndex: 'price',
+            render: (text: string) => <NumberFormat
+                value={text}
+                displayType={'text'}
+                thousandSeparator={'.'}
+                decimalSeparator={','}
+                prefix={"đ"}
+            />
         },
         {
             title: 'Số lượng',

@@ -72,9 +72,6 @@ export const EditProductPage = () => {
                         parser={(value: any) => value.replace(/\đ\s?|(,*)/g, '')}
                     />
                 </Form.Item>
-                <Form.Item name="quantity" label="Số lượng" rules={[{ type: 'number', min: 1, max: 100000000000 }, { required: true }]}>
-                    <InputNumber style={{ width: "100%" }} />
-                </Form.Item>
                 <Form.Item name='image' label="Ảnh" rules={[{ required: true, type: "url" }]}>
                     <Input />
                 </Form.Item>

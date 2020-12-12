@@ -11,6 +11,7 @@ export interface Order {
     commune: string;
     weight: number;
     amount: number;
+    note: string;
     products: [
         {
             sku: string,
@@ -28,15 +29,10 @@ export function createOrder(order: Order) {
     })
 }
 
-export function getOrdersByCustomer({ customerId }: any) {
-    return axios.get(`/order/${customerId}`)
+export function getOrdersByCustomer(customerId: string) {
+    return axios.get(`/order/customer?id=${customerId}`)
 }
 
-export function getOrders({ displayName, password, email, phone }: any) {
-    return axios.post("/auth/register", {
-        displayName,
-        password,
-        email,
-        phone
-    })
+export function getOrders(limit: any, offset: any) {
+    return axios.get(`/order?limit=${limit}&offset=${offset}`)
 }

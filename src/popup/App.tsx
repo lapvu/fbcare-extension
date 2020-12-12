@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Route, Switch, HashRouter, Redirect } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { MyLayout } from './components/Layout';
 import {
     LoginPage,
@@ -10,7 +10,8 @@ import {
     EmployeePage,
     ConversationPage,
     TransportPage,
-    ProfilePage
+    ProfilePage,
+    OrderPage
 } from "./pages";
 import {
     LOGIN_ROUTE,
@@ -21,14 +22,29 @@ import {
     CONVERSATION_ROUTE,
     PRODUCT_ROUTE,
     TRANSPORT_ROUTE,
-    PROFILE_ROUTE
+    PROFILE_ROUTE,
+    ORDER_ROUTE
 } from "./constant"
 import { PrivateRoute } from "./guard";
 import "./App.css";
 import { ProductPage } from "./pages/product";
+import { getOrderStatus } from "./api";
+import { setStatus } from "./redux/status";
 
 export function App() {
     const state = useSelector((state: any) => state.authReducer);
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        const initStatusOrder = async () => {
+            const res = await getOrderStatus();
+            if (res.data.status === "Success") {
+                dispatch(setStatus(res.data.results))
+            }
+        }
+        initStatusOrder();
+    }, [])
+
     return (
         <HashRouter>
             <Switch>
@@ -49,6 +65,9 @@ export function App() {
                             </Route>
                             <Route path={CONVERSATION_ROUTE}>
                                 <ConversationPage />
+                            </Route>
+                            <Route path={ORDER_ROUTE}>
+                                <OrderPage />
                             </Route>
                             <Route path={PROFILE_ROUTE}>
                                 <ProfilePage />

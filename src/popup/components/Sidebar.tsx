@@ -35,17 +35,15 @@ export const Sidebar: FC<{ collapsed: boolean }> = ({ collapsed }) => {
                 <Menu.Item key={CONVERSATION_ROUTE} icon={<NotificationOutlined />}>
                     <NavLink to={CONVERSATION_ROUTE}>Hội thoại</NavLink>
                 </Menu.Item>
-                {
-                    auth.roles.includes("supplier") && <Menu.Item key={PRODUCT_ROUTE} icon={<DropboxOutlined />}>
-                        <NavLink to={PRODUCT_ROUTE}>Sản phẩm</NavLink>
-                    </Menu.Item>
-                }
                 <Menu.Item key={ORDER_ROUTE} icon={<ReconciliationOutlined />}>
                     <NavLink to={ORDER_ROUTE}>Đơn hàng</NavLink>
                 </Menu.Item>
                 {
                     auth.roles.includes("supplier") &&
                     <>
+                        <Menu.Item key={PRODUCT_ROUTE} icon={<DropboxOutlined />}>
+                            <NavLink to={PRODUCT_ROUTE}>Sản phẩm</NavLink>
+                        </Menu.Item>
                         <Menu.Item key={EMPLOYEE_ROUTE} icon={<TeamOutlined />}>
                             <NavLink to={EMPLOYEE_ROUTE}>Nhân viên</NavLink>
                         </Menu.Item>

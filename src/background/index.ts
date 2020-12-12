@@ -96,7 +96,7 @@ function main(cb: any) {
     });
 }
 
-async function getCQuickToken(pageinfo: any): Promise<any> {
+async function getCQuickTokenPage(pageinfo: any): Promise<any> {
     const res = await fetch(`https://www.facebook.com/${pageinfo.id}/inbox`);
     const data = await res.text();
     const match = data.match(/compat_iframe_token":"(.*?)"/) as any;
@@ -104,6 +104,14 @@ async function getCQuickToken(pageinfo: any): Promise<any> {
         ...pageinfo,
         url: `https://www.facebook.com/${pageinfo.id}/inbox?cquick=jsc_c_p&cquick_token=${match[1]}&ctarget=https://www.facebook.com`
     };
+}
+
+async function getCQuickTokenMessenger(): Promise<any> {
+    const res = await fetch(`https://www.facebook.com/messages/`);
+    const data = await res.text();
+    const match = data.match(/compat_iframe_token":"(.*?)"/) as any;
+    return `https://www.facebook.com/messages/?cquick=jsc_c_h&cquick_token=${match[1]}&ctarget=https://www.facebook.com`
+
 }
 
 function getStorage(key: string): Promise<any> {
@@ -133,8 +141,9 @@ main(async function (tab: any) {
             getFbUserAvatar(token, userId),
             getFbPagesInfo(token, userId)
         ]);
-        pagesInfo = await Promise.all(pagesInfo.data.map((e: any) => getCQuickToken(e)))
-        setStorage({ fbInfo: [{ avatar, ...userInfo, url: "https://www.messenger.com/" }, ...pagesInfo] })
+        pagesInfo = await Promise.all(pagesInfo.data.map((e: any) => getCQuickTokenPage(e)));
+        const messUrl = await getCQuickTokenMessenger();
+        setStorage({ fbInfo: [{ avatar, ...userInfo, url: messUrl }, ...pagesInfo] })
     } catch (error) {
         chrome.storage.sync.remove("fbInfo");
         console.log(error)
@@ -145,7 +154,7 @@ main(async function (tab: any) {
 let old_id = "";
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     if (message.type === "CUSTOMER_CHANGE_CONTENT") {
-        if (sender.origin === "https://www.facebook.com") {
+        if (/https:\/\/www.facebook.com\/(.*?)\/inbox/.test(message.url)) {
             const match = message.url.match(/&selected_item_id=(.*?)/);
             if (match) {
                 const customer_id = message.url.split("&selected_item_id=")[1];
@@ -163,10 +172,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
                     }
                 }
             }
-        } else if (sender.origin === "https://www.messenger.com") {
-            const match = message.url.match(/https:\/\/www.messenger.com\/t\/(.*?)/);
+        } else if (/https:\/\/www.facebook.com\/messages\/t\/(.*?)/.test(message.url)) {
+            const match = message.url.match(/https:\/\/www.facebook.com\/messages\/t\/(.*?)\?/);
             if (match) {
-                let customer_id = message.url.replace("https://www.messenger.com/t/", "");
+                let customer_id = match[1]
                 if (old_id !== customer_id) {
                     old_id = customer_id;
                     let result = await getRealCustomerId(customer_id) as any;

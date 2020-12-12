@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, lazy } from "react";
+import React, { FC, useState, useEffect, useRef } from "react";
 import {
     Drawer,
     Row,
@@ -17,9 +17,7 @@ import {
     AutoComplete,
 } from "antd";
 import NumberFormat from 'react-number-format';
-import { createOrder, getCommune, getDistrict, getProvince, Order } from '../../../api';
-
-const SelectProductModal = lazy(() => import("./SelectProductModal"));
+import { createOrder, getCommune, getDistrict, getProvince, Order, searchProducts } from '../../../api';
 
 const validateMessages = {
     required: 'Vui lòng nhập ${label}!',
@@ -31,28 +29,30 @@ const validateMessages = {
     },
 };
 
-const mockVal = (str: string, repeat: number = 1) => {
-    return {
-        value: str.repeat(repeat),
-    };
-};
-
 const ShoppingCart: FC<{
     visible: boolean,
     setVisible: any,
     customerId: string,
     customerName: string,
-    customerPhone: string
-}> = ({ visible, setVisible, customerId, customerName, customerPhone }) => {
+    customerPhone: string,
+    setOrders: any,
+    orders: any
+}> = ({ visible, setVisible, customerId, customerName, customerPhone, setOrders, orders }) => {
+
     const [form] = Form.useForm();
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [communes, setCommunes] = useState([]);
-    const [options, setOptions] = useState<{ value: string }[]>([]);
-    const [shoppingCart, setShoppingCart] = useState([])
+    const [options, setOptions] = useState<any>([]);
+    const [shoppingCart, setShoppingCart] = useState<any>([])
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isFormSubmit, setIsFormSubmit] = useState<boolean>(false);
     const [amount, setAmount] = useState<number>(0);
+    const [products, setProducts] = useState<any>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const typingRef = useRef<any>(null);
+
     useEffect(() => {
         const getProvinces = async () => {
             setIsLoading(true);
@@ -140,18 +140,29 @@ const ShoppingCart: FC<{
                 amount,
                 commune: JSON.parse(values.commune).name,
                 district: JSON.parse(values.district).name,
-                province: JSON.parse(values.province).name
+                province: JSON.parse(values.province).name,
+                note: values.note
             }
             try {
-                const order = await createOrder(orderInVo);
-                if (order) {
+                const res = await createOrder(orderInVo);
+                if (res) {
                     message.success('Tạo đơn hàng thành công!');
-                    form.resetFields();
+                    form.setFieldsValue({
+                        note: "",
+                        address: "",
+                        province: null,
+                        district: null,
+                        commune: null
+                    });
                     setShoppingCart([]);
+                    let copy = orders;
+                    copy.push(res.data);
+                    setOrders(copy);
                     setVisible(false);
                 }
                 setIsFormSubmit(false);
             } catch (error) {
+                console.log(error)
                 if (error.error.name === "transport") {
                     message.error("Bạn chưa cài đặt vận chuyển!");
                 }
@@ -160,14 +171,54 @@ const ShoppingCart: FC<{
         }
     };
 
+    const getProducts = async (query: string) => {
+        const res = await searchProducts(query);
+        if (res.data) {
+            const copy = res.data.map((e: any) => ({ value: e._id, label: e.product_name }));
+            setProducts(res.data);
+            setOptions(copy);
+        }
+    }
+
     const onSearch = (searchText: string) => {
-        setOptions(
-            !searchText ? [] : [mockVal(searchText), mockVal(searchText, 2), mockVal(searchText, 3)],
-        );
+        setSearchTerm(searchText);
+        if (typingRef.current) {
+            clearTimeout(typingRef.current);
+        }
+        typingRef.current = setTimeout(() => {
+            getProducts(searchText);
+        }, 300)
+    }
+
+    const onSelect = (data: any) => {
+        const product = products.filter((e: any) => e._id === data);
+        const copy = [...shoppingCart];
+        if (shoppingCart.length === 0) {
+            copy.push(product[0])
+        } else {
+            const listId = shoppingCart.map((e: any) => e._id);
+            if (listId.includes(data)) {
+                copy.forEach((e: any, i: number) => {
+                    if (e._id === data && copy[i].quantity < 1000) {
+                        copy[i].quantity++;
+                    }
+                })
+            } else {
+                copy.push(product[0]);
+            }
+        }
+        setShoppingCart(copy);
+        setSearchTerm("");
     };
-    const onSelect = (data: string) => {
-        console.log('onSelect', data);
-    };
+
+    const handleDiscountChange = (e: any) => {
+        let total = 0;
+        shoppingCart.forEach((e: any) => {
+            total += (e.quantity * e.price)
+        })
+        const amountAf = total - total * (+e / 100);
+        setAmount(amountAf);
+    }
 
     const columns = [
         {
@@ -224,8 +275,6 @@ const ShoppingCart: FC<{
             </Popconfirm>
         },
     ]
-
-
 
     return (
         <Drawer
@@ -354,28 +403,59 @@ const ShoppingCart: FC<{
                         </Form.Item>
                     </Col>
                 </Row>
-                <Form.Item
-                    name="address"
-                    label="Địa chỉ cụ thể"
-                    rules={[{ required: true }]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item>
-                    <AutoComplete
-                        style={{ width: 400 }}
-                        options={options}
-                        onSelect={onSelect}
-                        onSearch={onSearch}
-                    >
-                        <Input.Search placeholder="Thêm nhanh sản phẩm" enterButton />
-                    </AutoComplete>
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            name="address"
+                            label="Địa chỉ cụ thể"
+                            rules={[{ required: true }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="note"
+                            label="Ghi chú khi giao hàng"
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                </Row>
             </Form>
             <Table
                 dataSource={shoppingCart}
                 columns={columns}
                 pagination={false}
+                showHeader={false}
+                title={() =>
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "space-between"
+                    }}>
+                        <InputNumber
+                            defaultValue={0}
+                            min={0}
+                            max={100}
+                            formatter={value => `${value}%`}
+                            parser={(value: any) => value.replace('%', '')}
+                            onChange={handleDiscountChange}
+                        />
+                        <AutoComplete
+                            style={{ width: 380 }}
+                            options={options}
+                            onSelect={onSelect}
+                            onSearch={onSearch}
+                            value={searchTerm}
+                        >
+                            <Input.Search
+                                placeholder="Thêm nhanh sản phẩm"
+                                enterButton
+                            />
+                        </AutoComplete>
+                    </div>
+
+                }
             />
         </Drawer>
     )

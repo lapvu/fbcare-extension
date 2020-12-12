@@ -1,30 +1,17 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
-import { Button, Tabs, Form, Input, Table, List, Popconfirm, message } from 'antd';
-import PlusOutlined from '@ant-design/icons/PlusOutlined';
+import React, { useEffect, useState } from 'react';
+import { Button, Tabs, Form, Input, Table, List, Popconfirm, message, Typography } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import NumberFormat from 'react-number-format';
+import { useSelector } from "react-redux";
 import { getOrdersByCustomer, getNotes, addNote, deleteNote } from "../../../api"
-const ShoppingCart = lazy(() => import('./ShoppingCart'));
+import ShoppingCart from "./ShoppingCart";
 
 const { TabPane } = Tabs;
 
-const columns = [
-    {
-        title: '',
-        dataIndex: 'id',
-        key: '_id',
-    },
-    {
-        title: '',
-        dataIndex: 'totalPrice',
-        key: 'totalPrice',
-    },
-    {
-        title: '',
-        dataIndex: 'address',
-        key: 'address',
-    },
-]
-
 export const CustomerContainer = () => {
+
+    const state = useSelector((state: any) => state.statusReducer);
+
     const [visible, setVisible] = useState(false);
     const [customerId, setCustomerId] = useState("");
     const [customerName, setCustomerName] = useState("");
@@ -33,6 +20,7 @@ export const CustomerContainer = () => {
     const [notes, setNotes] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [form] = Form.useForm();
+
     useEffect(() => {
         setIsLoading(true);
         chrome.runtime.sendMessage({ type: "CONVERSATION_INIT" });
@@ -69,7 +57,7 @@ export const CustomerContainer = () => {
         }
         if (customerId) {
             initNotes();
-            //initOrders();
+            initOrders();
         }
     }, [customerId])
 
@@ -94,6 +82,40 @@ export const CustomerContainer = () => {
             message.warn("Bạn không thể xóa ghi chú này!")
         }
     }
+
+    const columns = [
+        {
+            title: 'Mã đơn hàng',
+            dataIndex: '_id',
+            key: '_id',
+            render: (text: string) => <b>{text}</b>
+        },
+        {
+            title: 'Đơn giá',
+            dataIndex: 'amount',
+            key: 'amount',
+            render: (text: string) => <NumberFormat
+                value={text}
+                displayType={'text'}
+                thousandSeparator={'.'}
+                decimalSeparator={','}
+                prefix={"đ"}
+            />
+        },
+        {
+            title: 'Số sản phẩm',
+            dataIndex: 'total_quantity',
+            key: 'total_quantity',
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: "status",
+            key: "status",
+            render: (text: string) => <Typography.Text>
+                {state.status.length !== 0 ? state.status.find((e: any) => e.key == text).value : ""}
+            </Typography.Text>
+        }
+    ]
 
     return (
         <div style={{
@@ -146,7 +168,7 @@ export const CustomerContainer = () => {
                         />
                     </TabPane>
                     <TabPane tab="Đơn hàng" key="2">
-                        <Table dataSource={orders} columns={columns} showHeader={false} loading={isLoading} />
+                        <Table dataSource={orders} columns={columns} loading={isLoading} pagination={false} />
                     </TabPane>
                 </Tabs>
             </div>
@@ -164,15 +186,15 @@ export const CustomerContainer = () => {
                 >
                     Tạo đơn hàng mới
                  </Button>
-                <Suspense fallback={<div>loading</div>}>
-                    <ShoppingCart
-                        visible={visible}
-                        setVisible={setVisible}
-                        customerId={customerId}
-                        customerName={customerName}
-                        customerPhone={customerPhone}
-                    />
-                </Suspense>
+                <ShoppingCart
+                    visible={visible}
+                    setVisible={setVisible}
+                    customerId={customerId}
+                    customerName={customerName}
+                    customerPhone={customerPhone}
+                    setOrders={setOrders}
+                    orders={orders}
+                />
             </div>
         </div>
     )
