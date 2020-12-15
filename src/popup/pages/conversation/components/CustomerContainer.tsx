@@ -85,7 +85,7 @@ export const CustomerContainer = () => {
 
     const columns = [
         {
-            title: 'Mã đơn hàng',
+            title: '#',
             dataIndex: '_id',
             key: '_id',
             render: (text: string) => <b>{text}</b>
@@ -103,7 +103,7 @@ export const CustomerContainer = () => {
             />
         },
         {
-            title: 'Số sản phẩm',
+            title: 'Sl',
             dataIndex: 'total_quantity',
             key: 'total_quantity',
         },
@@ -144,31 +144,39 @@ export const CustomerContainer = () => {
                                 </Button>
                             </Form.Item>
                         </Form>
-                        <List
-                            size="small"
-                            itemLayout="horizontal"
-                            dataSource={notes}
-                            loading={isLoading}
-                            renderItem={(item: any) => (
-                                <List.Item
-                                    actions={[<Popconfirm
-                                        placement="left"
-                                        title="Bạn có muốn xóa ghi chú này?"
-                                        key="list-remove"
-                                        onConfirm={() => removeNote(item._id)}
-                                        okText="Có"
-                                        cancelText="Không"
+                        <div style={{ maxHeight: 350, overflowY: "auto" }}>
+                            <List
+                                size="small"
+                                itemLayout="horizontal"
+                                dataSource={notes}
+                                loading={isLoading}
+                                renderItem={(item: any) => (
+                                    <List.Item
+                                        actions={[<Popconfirm
+                                            placement="left"
+                                            title="Bạn có muốn xóa ghi chú này?"
+                                            key="list-remove"
+                                            onConfirm={() => removeNote(item._id)}
+                                            okText="Có"
+                                            cancelText="Không"
+                                        >
+                                            <Button type="link">Xóa</Button>
+                                        </Popconfirm>]}
                                     >
-                                        <Button type="link">Xóa</Button>
-                                    </Popconfirm>]}
-                                >
-                                    {item.note}
-                                </List.Item>
-                            )}
-                        />
+                                        {item.note}
+                                    </List.Item>
+                                )}
+                            />
+                        </div>
                     </TabPane>
                     <TabPane tab="Đơn hàng" key="2">
-                        <Table dataSource={orders} columns={columns} loading={isLoading} pagination={false} />
+                        <Table
+                            dataSource={orders}
+                            columns={columns}
+                            loading={isLoading}
+                            pagination={false}
+                            size="small"
+                        />
                     </TabPane>
                 </Tabs>
             </div>

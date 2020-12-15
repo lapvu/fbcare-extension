@@ -38,6 +38,16 @@ export const OrderPage = () => {
             render: (id: any) => <b>{id}</b>,
         },
         {
+            title: "Tên khách hàng",
+            dataIndex: "customer_name",
+            key: "customer_name"
+        },
+        {
+            title: "Số điện thoại",
+            dataIndex: "customer_phone",
+            key: "customer_phone"
+        },
+        {
             title: 'Tổng tiền',
             key: 'amount',
             dataIndex: 'amount',
@@ -55,14 +65,6 @@ export const OrderPage = () => {
             key: 'total_quantity',
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
-            render: (text: string) => <Typography.Text>
-                {state.status.length !== 0 ? state.status.find((e: any) => e.key == text).value : ""}
-            </Typography.Text>
-        },
-        {
             title: 'Tạo bởi',
             dataIndex: 'create_by',
             key: 'create_by',
@@ -72,6 +74,14 @@ export const OrderPage = () => {
             dataIndex: 'createdAt',
             key: 'createdAt',
             render: (text: string) => <Typography.Text>{format(new Date(text), 'MM/dd/yyyy')}</Typography.Text>
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text: string) => <Typography.Text>
+                {state.status.length !== 0 ? state.status.find((e: any) => e.key == text).value : ""}
+            </Typography.Text>
         },
     ]
 

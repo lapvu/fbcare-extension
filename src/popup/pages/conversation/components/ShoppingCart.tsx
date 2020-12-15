@@ -228,7 +228,7 @@ const ShoppingCart: FC<{
         },
         {
             title: '',
-            dataIndex: 'productName',
+            dataIndex: 'product_name',
         },
         {
             title: '',
@@ -259,6 +259,7 @@ const ShoppingCart: FC<{
                 thousandSeparator={'.'}
                 decimalSeparator={','}
                 prefix={"đ "}
+                style={{ color: "#ee4d2d" }}
             />
         },
         {
@@ -331,17 +332,15 @@ const ShoppingCart: FC<{
                     <Col span={8}>
                         <Form.Item
                             name="customer_name"
-                            label="Tên khách hàng"
                             rules={[{ required: true }]}
 
                         >
-                            <Input />
+                            <Input placeholder="Tên khách hàng" />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
                         <Form.Item
                             name="customer_phone"
-                            label="Số điện thoại"
                             rules={[
                                 {
                                     required: true,
@@ -350,15 +349,14 @@ const ShoppingCart: FC<{
                                 },
                             ]}
                         >
-                            <Input />
+                            <Input placeholder="Số điện thoại" />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
                         <Form.Item
                             name="customer_email"
-                            label="Email"
                         >
-                            <Input />
+                            <Input placeholder="Địa chỉ email" />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -366,10 +364,9 @@ const ShoppingCart: FC<{
                     <Col span={8}>
                         <Form.Item
                             name="province"
-                            label="Tỉnh/Thành Phố"
                             rules={[{ required: true }]}
                         >
-                            <Select loading={isLoading} onChange={handleProvinceChange}>
+                            <Select loading={isLoading} onChange={handleProvinceChange} placeholder="Tỉnh/Thành Phố">
                                 {provinces.map((province: any) => (
                                     <Select.Option key={province.code} value={JSON.stringify(province)}>{province.name}</Select.Option>
                                 ))}
@@ -379,10 +376,9 @@ const ShoppingCart: FC<{
                     <Col span={8}>
                         <Form.Item
                             name="district"
-                            label="Quận/Huyện"
                             rules={[{ required: true }]}
                         >
-                            <Select loading={isLoading} onChange={handleDistrictChange}>
+                            <Select loading={isLoading} onChange={handleDistrictChange} placeholder="Quận/Huyện">
                                 {districts.map((district: any) => (
                                     <Select.Option key={district.code} value={JSON.stringify(district)}>{district.name}</Select.Option>
                                 ))}
@@ -392,10 +388,9 @@ const ShoppingCart: FC<{
                     <Col span={8}>
                         <Form.Item
                             name="commune"
-                            label="Phường/Xã"
                             rules={[{ required: true }]}
                         >
-                            <Select loading={isLoading}>
+                            <Select loading={isLoading} placeholder="Phường/Xã">
                                 {communes.map((commune: any) => (
                                     <Select.Option key={commune.code} value={JSON.stringify(commune)}>{commune.name}</Select.Option>
                                 ))}
@@ -407,18 +402,16 @@ const ShoppingCart: FC<{
                     <Col span={12}>
                         <Form.Item
                             name="address"
-                            label="Địa chỉ cụ thể"
                             rules={[{ required: true }]}
                         >
-                            <Input />
+                            <Input placeholder="Địa chỉ cụ thể" />
                         </Form.Item>
                     </Col>
                     <Col span={12}>
                         <Form.Item
                             name="note"
-                            label="Ghi chú khi giao hàng"
                         >
-                            <Input />
+                            <Input placeholder="Ghi chú khi giao hàng" />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -428,19 +421,28 @@ const ShoppingCart: FC<{
                 columns={columns}
                 pagination={false}
                 showHeader={false}
+                size="small"
+                style={{
+                    overflowX: "auto",
+                    maxHeight: 500
+                }}
                 title={() =>
                     <div style={{
                         display: "flex",
-                        justifyContent: "space-between"
+                        justifyContent: "space-between",
                     }}>
-                        <InputNumber
-                            defaultValue={0}
-                            min={0}
-                            max={100}
-                            formatter={value => `${value}%`}
-                            parser={(value: any) => value.replace('%', '')}
-                            onChange={handleDiscountChange}
-                        />
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <Typography.Text style={{ marginRight: 10 }}>Giảm giá</Typography.Text>
+                            <InputNumber
+                                defaultValue={0}
+                                min={0}
+                                max={100}
+                                formatter={value => `${value}%`}
+                                parser={(value: any) => value.replace('%', '')}
+                                onChange={handleDiscountChange}
+
+                            />
+                        </div>
                         <AutoComplete
                             style={{ width: 380 }}
                             options={options}

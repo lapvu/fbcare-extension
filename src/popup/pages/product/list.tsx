@@ -112,6 +112,7 @@ export const ListProductPage = () => {
             <Table
                 loading={isLoading}
                 columns={columns}
+                size="small"
                 pagination={{
                     pageSize: 5,
                     defaultCurrent: 1,

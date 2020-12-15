@@ -88,6 +88,7 @@ export const ListEmployeePage = () => {
             <Table
                 loading={isLoading}
                 columns={columns}
+                size="small"
                 pagination={{
                     pageSize: 5,
                     defaultCurrent: 1,
