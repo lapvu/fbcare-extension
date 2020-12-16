@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { PageHeader, Table, Typography } from 'antd';
-import { format } from 'date-fns'
 import NumberFormat from 'react-number-format';
-import { useSelector } from "react-redux";
+import { format } from 'date-fns'
+
 import { getOrders } from '../../api';
 import { Container } from '../../components/Container';
 
 export const OrderPage = () => {
-    const state = useSelector((state: any) => state.statusReducer);
 
     const [total, setTotal] = useState(1);
     const [pageSize] = useState(5);
@@ -48,6 +47,18 @@ export const OrderPage = () => {
             key: "customer_phone"
         },
         {
+            title: 'Phí ship',
+            key: 'fee',
+            dataIndex: 'fee',
+            render: (text: string) => <NumberFormat
+                value={text}
+                displayType={'text'}
+                thousandSeparator={'.'}
+                decimalSeparator={','}
+                prefix={"đ "}
+            />
+        },
+        {
             title: 'Tổng tiền',
             key: 'amount',
             dataIndex: 'amount',
@@ -56,7 +67,7 @@ export const OrderPage = () => {
                 displayType={'text'}
                 thousandSeparator={'.'}
                 decimalSeparator={','}
-                prefix={"đ"}
+                prefix={"đ "}
             />
         },
         {
@@ -77,10 +88,10 @@ export const OrderPage = () => {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'status_name',
+            key: 'status_name',
             render: (text: string) => <Typography.Text>
-                {state.status.length !== 0 ? state.status.find((e: any) => e.key == text).value : ""}
+                {text}
             </Typography.Text>
         },
     ]
@@ -92,7 +103,7 @@ export const OrderPage = () => {
                 ghost={false}
             />
             <Table
-                loading={isLoading || state.status.length === 0}
+                loading={isLoading}
                 columns={columns}
                 pagination={{
                     pageSize: 5,

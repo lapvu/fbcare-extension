@@ -2,15 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Button, Tabs, Form, Input, Table, List, Popconfirm, message, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import NumberFormat from 'react-number-format';
-import { useSelector } from "react-redux";
 import { getOrdersByCustomer, getNotes, addNote, deleteNote } from "../../../api"
 import ShoppingCart from "./ShoppingCart";
 
 const { TabPane } = Tabs;
 
 export const CustomerContainer = () => {
-
-    const state = useSelector((state: any) => state.statusReducer);
 
     const [visible, setVisible] = useState(false);
     const [customerId, setCustomerId] = useState("");
@@ -99,7 +96,7 @@ export const CustomerContainer = () => {
                 displayType={'text'}
                 thousandSeparator={'.'}
                 decimalSeparator={','}
-                prefix={"đ"}
+                prefix={"đ "}
             />
         },
         {
@@ -109,10 +106,10 @@ export const CustomerContainer = () => {
         },
         {
             title: 'Trạng thái',
-            dataIndex: "status",
-            key: "status",
+            dataIndex: "status_name",
+            key: "status_name",
             render: (text: string) => <Typography.Text>
-                {state.status.length !== 0 ? state.status.find((e: any) => e.key == text).value : ""}
+                {text}
             </Typography.Text>
         }
     ]

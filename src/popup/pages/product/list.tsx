@@ -47,7 +47,7 @@ export const ListProductPage = () => {
                 displayType={'text'}
                 thousandSeparator={'.'}
                 decimalSeparator={','}
-                prefix={"đ"}
+                prefix={"đ "}
             />
         },
         {

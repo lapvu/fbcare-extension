@@ -124,7 +124,7 @@ const ShoppingCart: FC<{
             setIsFormSubmit(true);
             const products = shoppingCart.map((e: any) => ({
                 sku: e._id,
-                name: e.productName,
+                name: e.product_name,
                 price: e.price,
                 weight: e.weight,
                 quantity: e.quantity

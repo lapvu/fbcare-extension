@@ -28,22 +28,9 @@ import {
 import { PrivateRoute } from "./guard";
 import "./App.css";
 import { ProductPage } from "./pages/product";
-import { getOrderStatus } from "./api";
-import { setStatus } from "./redux/status";
 
 export function App() {
     const state = useSelector((state: any) => state.authReducer);
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        const initStatusOrder = async () => {
-            const res = await getOrderStatus();
-            if (res.data.status === "Success") {
-                dispatch(setStatus(res.data.results))
-            }
-        }
-        initStatusOrder();
-    }, [])
 
     return (
         <HashRouter>
