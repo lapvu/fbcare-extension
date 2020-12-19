@@ -11,9 +11,13 @@ export const ConversationPage = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        chrome.storage.sync.get(['fbInfo'], function (result: any) {
-            setFbInfo(result['fbInfo'] ? result['fbInfo'] : []);
-            setIsLoading(false);
+        chrome.runtime.sendMessage({ type: "RELOAD_APP" }, function (res) {
+            if (res.status === "done") {
+                chrome.storage.sync.get(['fbInfo'], function (result: any) {
+                    setFbInfo(result['fbInfo'] ? result['fbInfo'] : []);
+                    setIsLoading(false);
+                });
+            }
         });
     }, [])
 

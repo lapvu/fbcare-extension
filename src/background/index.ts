@@ -133,23 +133,8 @@ function setStorage(data: any) {
 main(async function (tab: any) {
     enableIframeAccess();
     enableFbRequestAccess();
-    try {
-        const userId = await getFbUserId();
-        const token = await getFbAccessToken();
-        var [userInfo, avatar, pagesInfo] = await Promise.all([
-            getFbUserInfo(token, userId),
-            getFbUserAvatar(token, userId),
-            getFbPagesInfo(token, userId)
-        ]);
-        pagesInfo = await Promise.all(pagesInfo.data.map((e: any) => getCQuickTokenPage(e)));
-        const messUrl = await getCQuickTokenMessenger();
-        setStorage({ fbInfo: [{ avatar, ...userInfo, url: messUrl }, ...pagesInfo] })
-    } catch (error) {
-        chrome.storage.sync.remove("fbInfo");
-        console.log(error)
-    }
+    load();
 });
-
 
 let old_id = "";
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
@@ -195,6 +180,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.type === "CONVERSATION_INIT") {
         old_id = "";
     }
+    if (message.type === "RELOAD_APP") {
+        load();
+        sendResponse({ status: "done" })
+    }
 });
 
 function getRealCustomerId(id: string) {
@@ -211,4 +200,22 @@ function getRealCustomerId(id: string) {
                 }
             }).catch(err => resolve(""));
     })
+}
+
+async function load() {
+    try {
+        const userId = await getFbUserId();
+        const token = await getFbAccessToken();
+        var [userInfo, avatar, pagesInfo] = await Promise.all([
+            getFbUserInfo(token, userId),
+            getFbUserAvatar(token, userId),
+            getFbPagesInfo(token, userId)
+        ]);
+        pagesInfo = await Promise.all(pagesInfo.data.map((e: any) => getCQuickTokenPage(e)));
+        const messUrl = await getCQuickTokenMessenger();
+        setStorage({ fbInfo: [{ avatar, ...userInfo, url: messUrl }, ...pagesInfo] })
+    } catch (error) {
+        chrome.storage.sync.remove("fbInfo");
+        console.log(error)
+    }
 }

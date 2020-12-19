@@ -4,7 +4,8 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Sidebar } from './Sidebar';
 import { UserMenu } from "./Menu";
 import "./style.css";
@@ -12,6 +13,7 @@ import "./style.css";
 const { Header, Content } = Layout;
 
 export const MyLayout = ({ children }: any) => {
+    const state = useSelector((state: any) => state.authReducer);
     const [collapsed, setCollapsed] = useState(true);
     const location = useLocation();
     return (
@@ -35,15 +37,13 @@ export const MyLayout = ({ children }: any) => {
                         margin: "0 24px"
                     }}>
                         <Dropdown overlay={<UserMenu />} placement="bottomLeft" arrow>
-                            <Link to="profile">
-                                <Avatar
-                                    style={{
-                                        color: '#f56a00',
-                                        backgroundColor: '#fde3cf',
-                                        cursor: "pointer"
-                                    }}>U
-                                </Avatar>
-                            </Link>
+                            <Avatar
+                                style={{
+                                    color: '#f56a00',
+                                    backgroundColor: '#fde3cf',
+                                    cursor: "pointer"
+                                }}>{state.display_name[0].toUpperCase()}
+                            </Avatar>
                         </Dropdown>
                     </div>
                 </Header>

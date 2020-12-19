@@ -66,7 +66,6 @@ export const LoginPage = () => {
                     <Form.Item name="remember" valuePropName="checked" noStyle>
                         <Checkbox>Ghi nhớ</Checkbox>
                     </Form.Item>
-                    <Link to="forgot-password" style={{ float: "right" }}>Quên mật khẩu</Link>
                 </Form.Item>
 
                 <Form.Item>

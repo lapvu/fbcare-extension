@@ -77,8 +77,8 @@ export const OrderPage = () => {
         },
         {
             title: 'Tạo bởi',
-            dataIndex: 'create_by',
-            key: 'create_by',
+            dataIndex: 'created_name',
+            key: 'created_name',
         },
         {
             title: 'Ngày tạo',

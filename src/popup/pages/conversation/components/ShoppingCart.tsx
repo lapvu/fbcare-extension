@@ -50,7 +50,7 @@ const ShoppingCart: FC<{
     const [amount, setAmount] = useState<number>(0);
     const [products, setProducts] = useState<any>([]);
     const [searchTerm, setSearchTerm] = useState("");
-
+    const [discount, setDiscount] = useState<number>(0);
     const typingRef = useRef<any>(null);
 
     useEffect(() => {
@@ -120,54 +120,59 @@ const ShoppingCart: FC<{
     const onFinish = async (values: any) => {
         if (shoppingCart.length === 0) {
             message.error('Chưa có sản phẩm nào trong giỏ');
-        } else {
-            setIsFormSubmit(true);
-            const products = shoppingCart.map((e: any) => ({
-                sku: e._id,
-                name: e.product_name,
-                price: e.price,
-                weight: e.weight,
-                quantity: e.quantity
-            }))
-            const orderInVo: Order = {
-                customer_name: values.customer_name,
-                customer_phone: values.customer_phone,
-                customer_id: customerId,
-                customer_email: values.email,
-                products: [...products] as any,
-                weight: 1000,
-                address: values.address,
-                amount,
-                commune: JSON.parse(values.commune).name,
-                district: JSON.parse(values.district).name,
-                province: JSON.parse(values.province).name,
-                note: values.note
+            return;
+        }
+        if (amount > 20000000) {
+            message.warn('Giá trị đơn hàng không được vượt quá 20.000.000 đồng');
+            return;
+        }
+        setIsFormSubmit(true);
+        const products = shoppingCart.map((e: any) => ({
+            sku: e._id,
+            name: e.product_name,
+            price: e.price,
+            weight: e.weight,
+            quantity: e.quantity
+        }))
+        const orderInVo: Order = {
+            customer_name: values.customer_name,
+            customer_phone: values.customer_phone,
+            customer_id: customerId,
+            customer_email: values.email,
+            products: [...products] as any,
+            weight: 1000,
+            address: values.address,
+            amount,
+            commune: JSON.parse(values.commune).name,
+            district: JSON.parse(values.district).name,
+            province: JSON.parse(values.province).name,
+            note: values.note
+        }
+        try {
+            const res = await createOrder(orderInVo);
+            if (res) {
+                message.success('Tạo đơn hàng thành công!');
+                form.setFieldsValue({
+                    note: "",
+                    address: "",
+                    province: null,
+                    district: null,
+                    commune: null
+                });
+                setShoppingCart([]);
+                let copy = [...orders];
+                copy.unshift(res.data);
+                setOrders(copy);
+                setVisible(false);
+                setDiscount(0);
             }
-            try {
-                const res = await createOrder(orderInVo);
-                if (res) {
-                    message.success('Tạo đơn hàng thành công!');
-                    form.setFieldsValue({
-                        note: "",
-                        address: "",
-                        province: null,
-                        district: null,
-                        commune: null
-                    });
-                    setShoppingCart([]);
-                    let copy = orders;
-                    copy.push(res.data);
-                    setOrders(copy);
-                    setVisible(false);
-                }
-                setIsFormSubmit(false);
-            } catch (error) {
-                console.log(error)
-                if (error.error.name === "transport") {
-                    message.error("Bạn chưa cài đặt vận chuyển!");
-                }
-                setIsFormSubmit(false);
+            setIsFormSubmit(false);
+        } catch (error) {
+            console.log(error)
+            if (error.error.name === "transport") {
+                message.error("Bạn chưa cài đặt vận chuyển!");
             }
+            setIsFormSubmit(false);
         }
     };
 
@@ -218,6 +223,7 @@ const ShoppingCart: FC<{
         })
         const amountAf = total - total * (+e / 100);
         setAmount(amountAf);
+        setDiscount(+e)
     }
 
     const columns = [
@@ -299,7 +305,8 @@ const ShoppingCart: FC<{
                             style={{
                                 fontSize: "1.5rem",
                                 color: "#ee4d2d",
-                                marginLeft: "1rem"
+                                marginLeft: "1rem",
+                                fontWeight: 600
                             }}
                         />
                     </div>
@@ -440,7 +447,7 @@ const ShoppingCart: FC<{
                                 formatter={value => `${value}%`}
                                 parser={(value: any) => value.replace('%', '')}
                                 onChange={handleDiscountChange}
-
+                                value={discount}
                             />
                         </div>
                         <AutoComplete

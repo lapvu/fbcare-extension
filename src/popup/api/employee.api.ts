@@ -24,5 +24,3 @@ export function getEmployees(getEmployeesInVO: GetEmployeesInVO) {
 export function deleteEmployee(id: string) {
     return axios.delete(`/employee/${id}`);
 }
-
-

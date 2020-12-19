@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { PageHeader, Space, Table, Image, Button, Popconfirm, message } from 'antd';
+import { PageHeader, Space, Table, Image, Button, Popconfirm, message, Typography } from 'antd';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns'
 import { deleteProduct, getProducts } from "../../api";
 
 export const ListProductPage = () => {
@@ -34,11 +35,6 @@ export const ListProductPage = () => {
             key: 'product_name',
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'product_desc',
-            key: 'product_desc',
-        },
-        {
             title: 'Giá tiền',
             key: 'price',
             dataIndex: 'price',
@@ -54,6 +50,12 @@ export const ListProductPage = () => {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
+        },
+        {
+            title: 'Ngày tạo',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (text: string) => <Typography.Text>{format(new Date(text), 'MM/dd/yyyy')}</Typography.Text>
         },
         {
             title: 'Ảnh',
