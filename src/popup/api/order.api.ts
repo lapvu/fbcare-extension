@@ -36,3 +36,7 @@ export function getOrdersByCustomer(customerId: string) {
 export function getOrders(limit: any, offset: any) {
     return axios.get(`/order?limit=${limit}&offset=${offset}`)
 }
+
+export function getFee(invo: any) {
+    return axios.post(`/order/fee`, invo);
+}

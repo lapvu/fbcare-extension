@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { PageHeader, Table, Typography } from 'antd';
+import { PageHeader, Table, Tag, Typography } from 'antd';
 import NumberFormat from 'react-number-format';
 import { format } from 'date-fns'
 
@@ -90,9 +90,9 @@ export const OrderPage = () => {
             title: 'Trạng thái',
             dataIndex: 'status_name',
             key: 'status_name',
-            render: (text: string) => <Typography.Text>
+            render: (text: string) => <Tag color={text === "Huỷ" ? "#e74c3c" : "#1abc9c"}>
                 {text}
-            </Typography.Text>
+            </Tag>
         },
     ]
 

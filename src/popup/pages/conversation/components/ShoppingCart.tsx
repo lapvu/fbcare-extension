@@ -17,7 +17,7 @@ import {
     AutoComplete,
 } from "antd";
 import NumberFormat from 'react-number-format';
-import { createOrder, getCommune, getDistrict, getProvince, Order, searchProducts } from '../../../api';
+import { createOrder, getCommune, getDistrict, getFee, getProvince, Order, searchProducts } from '../../../api';
 
 const validateMessages = {
     required: 'Vui lòng nhập ${label}!',
@@ -51,6 +51,7 @@ const ShoppingCart: FC<{
     const [products, setProducts] = useState<any>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [discount, setDiscount] = useState<number>(0);
+    const [fee, setFee] = useState(0);
     const typingRef = useRef<any>(null);
 
     useEffect(() => {
@@ -69,6 +70,24 @@ const ShoppingCart: FC<{
             customer_phone: customerPhone
         })
     }, [customerName, customerPhone])
+
+    useEffect(() => {
+        const getFeeShip = async () => {
+            const receiver_province = JSON.parse(form.getFieldValue("province")).name;
+            const receiver_district = JSON.parse(form.getFieldValue("district")).name;
+            const res = await getFee({
+                receiver_province,
+                receiver_district,
+                weight: 1000
+            });
+            if (res.data.status === "Success") {
+                setFee(+res.data.results[0].fee)
+            }
+        }
+        if (shoppingCart.length > 0 && districts && provinces) {
+            getFeeShip();
+        }
+    }, [shoppingCart, districts, provinces])
 
     const handleProvinceChange = async (province: any) => {
         setIsLoading(true);
@@ -165,6 +184,7 @@ const ShoppingCart: FC<{
                 setOrders(copy);
                 setVisible(false);
                 setDiscount(0);
+                setFee(0);
             }
             setIsFormSubmit(false);
         } catch (error) {
@@ -293,22 +313,52 @@ const ShoppingCart: FC<{
                 <div>
                     <div style={{
                         display: "flex",
-                        justifyContent: "flex-start",
-                        alignItems: "center"
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        width: "100%"
                     }}>
-                        <Typography.Text>Tổng tiền: </Typography.Text><NumberFormat
-                            value={amount}
-                            displayType={'text'}
-                            thousandSeparator={'.'}
-                            decimalSeparator={','}
-                            prefix={"đ"}
-                            style={{
-                                fontSize: "1.5rem",
-                                color: "#ee4d2d",
-                                marginLeft: "1rem",
-                                fontWeight: 600
-                            }}
-                        />
+                        <div>
+                            <div>
+                                <Typography.Text>Tạm tính: </Typography.Text><NumberFormat
+                                    value={amount}
+                                    displayType={'text'}
+                                    thousandSeparator={'.'}
+                                    decimalSeparator={','}
+                                    prefix={"đ"}
+                                    style={{
+                                        fontSize: "1rem",
+                                        color: "#ee4d2d",
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <Typography.Text>Phí ship: </Typography.Text><NumberFormat
+                                    value={fee}
+                                    displayType={'text'}
+                                    thousandSeparator={'.'}
+                                    decimalSeparator={','}
+                                    prefix={"đ"}
+                                />
+                            </div>
+                        </div>
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center"
+                        }}>
+                            <Typography.Text>Thành tiền: </Typography.Text><NumberFormat
+                                value={amount + fee}
+                                displayType={'text'}
+                                thousandSeparator={'.'}
+                                decimalSeparator={','}
+                                prefix={"đ"}
+                                style={{
+                                    fontSize: "1.5rem",
+                                    color: "#ee4d2d",
+                                    marginLeft: "0.5rem",
+                                    fontWeight: 600
+                                }}
+                            />
+                        </div>
                     </div>
                     <Divider />
                     <div style={{ textAlign: "right" }}>
@@ -324,7 +374,6 @@ const ShoppingCart: FC<{
                             Hoàn tất
                           </Button>
                     </div>
-
                 </div>
             }
         >

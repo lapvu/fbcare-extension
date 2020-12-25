@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tabs, Form, Input, Table, List, Popconfirm, message, Typography } from 'antd';
+import { Button, Tabs, Form, Input, Table, List, Popconfirm, message, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import NumberFormat from 'react-number-format';
 import { getOrdersByCustomer, getNotes, addNote, deleteNote } from "../../../api"
@@ -108,9 +108,9 @@ export const CustomerContainer = () => {
             title: 'Trạng thái',
             dataIndex: "status_name",
             key: "status_name",
-            render: (text: string) => <Typography.Text>
+            render: (text: string) => <Tag color={text === "Huỷ" ? "#e74c3c" : "#1abc9c"}>
                 {text}
-            </Typography.Text>
+            </Tag>
         }
     ]
 
